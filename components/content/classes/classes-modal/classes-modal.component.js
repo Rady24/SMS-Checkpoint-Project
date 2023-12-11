@@ -36,7 +36,7 @@ function updateClassData(isEditing) {
 
   if (isEditing) {
     const classId = parseInt(controller.getElementValueById("editClassId"), 10);
-    const existingClass = getClassById(classId);
+    const existingClass = controller.getElementById(classId, classesData);
 
     Object.assign(existingClass, classData);
   } else {

@@ -16,7 +16,7 @@ export default function classModalTemplate(pClass) {
                 <div class="mb-3">
                   <label for="${
                     isEditing ? "edit" : "add"
-                  }ClassName" class="form-label">Class Name:</label>
+                  }className" class="form-label">Class Name:</label>
                   <input type="text" id="${
                     isEditing ? "edit" : "add"
                   }className" class="form-control" ${
@@ -36,7 +36,7 @@ export default function classModalTemplate(pClass) {
                 <div class="mb-3">
                   <label for="${
                     isEditing ? "edit" : "add"
-                  }ClassDescription" class="form-label">Description:</label>
+                  }description" class="form-label">Description:</label>
                   <textarea id="${
                     isEditing ? "edit" : "add"
                   }description" class="form-control">${
