@@ -1,6 +1,7 @@
 import studentModalTemplate from "./student-modal.template.js";
 import studentsData from "../../../../data/studentsData.js";
 import studentCardTemplate from "../student-card/student-card.template.js";
+import * as validate from "../../../../utils/validation.js";
 
 let currentStudentId = null;
 
@@ -51,6 +52,91 @@ function parseGradeInput(inputValue) {
     return parsedGrade;
   }
 }
+function isValidInput(input, value) {
+  switch (input) {
+    case "Name":
+      return validate.isValidName(value);
+    case "Grade":
+      return validate.isValidGrade(value);
+    case "Class":
+      return validate.isNonEmptyString(value);
+    default:
+      return true;
+  }
+}
+function getInputElementValue(input, isEditing) {
+  return getElementValueById(`${isEditing ? "edit" : "add"}Student${input}`);
+}
+
+function validateAndUpdateDataField(input, value, data, isValid) {
+  if (!isValidInput(input, value)) {
+    isValid = false;
+    displayErrorMessage(`Invalid ${input.toLowerCase()}.`);
+  }
+
+  if (input.trim() === "Grade" && isValid) {
+    const parsedGrade = parseFloat(value);
+    data[input.toLowerCase()] = parsedGrade;
+  } else {
+    data[input.toLowerCase()] = value;
+  }
+
+  return isValid;
+}
+
+function updateSubjects(isEditing) {
+  const subjects = [];
+  const subjectCount = 3;
+
+  for (let i = 0; i < subjectCount; i++) {
+    const subjectNameElement = document.getElementById(`nameSubject${i}`);
+
+    if (!subjectNameElement) {
+      displayErrorMessage(`Subject name element not found for index ${i}`);
+      continue;
+    }
+
+    const subjectName = subjectNameElement.innerText;
+    const gradeInputValue = getElementValueById(`addSubject${i}`);
+    const parsedGrade = parseGradeInput(gradeInputValue);
+
+    if (subjectName && parsedGrade !== undefined) {
+      subjects.push({ name: subjectName, grade: parsedGrade });
+    } else {
+      subjects.push({ name: subjectName, grade: 0 });
+    }
+  }
+
+  return subjects;
+}
+
+function updateStudent(isEditing, studentId, studentData) {
+  const existingStudent = getStudentById(studentId);
+
+  if (!existingStudent) {
+    displayErrorMessage("Student not found");
+    return;
+  }
+
+  Object.assign(existingStudent, studentData);
+
+  existingStudent.subjects.forEach((subject, index) => {
+    const gradeInputValue = getElementValueById(`editSubject${index}`);
+    subject.grade = parseGradeInput(gradeInputValue);
+  });
+}
+
+function addNewStudent(studentData) {
+  const subjects = updateSubjects(false);
+
+  const newStudent = {
+    id: studentsData.length + 1,
+    ...studentData,
+    subjects,
+  };
+
+  studentsData.push(newStudent);
+}
 
 function updateStudentData(isEditing) {
   const inputs = ["Name", "Class", "Description"];
@@ -60,39 +146,23 @@ function updateStudentData(isEditing) {
   const studentData = {};
   let isValid = true;
 
-  const nameRegExp = /^[a-zA-Z\s]+$/;
-
-  const gradeRegExp = /^-?\d*\.?\d+$/;
-
   inputs.forEach((input) => {
-    const inputValue = getElementValueById(
-      `${isEditing ? "edit" : "add"}Student${input}`
+    const inputValue = getInputElementValue(input, isEditing);
+    isValid = validateAndUpdateDataField(
+      input,
+      inputValue,
+      studentData,
+      isValid
     );
-
-    if (input.trim() === "Name" && !nameRegExp.test(inputValue)) {
-      isValid = false;
-      displayErrorMessage("Name must contain only alphabetic characters.");
-    }
-
-    if (input.trim() === "Grade") {
-      const parsedGrade = parseFloat(inputValue);
-      if (isNaN(parsedGrade) || !gradeRegExp.test(inputValue)) {
-        isValid = false;
-        displayErrorMessage("Grade must be a valid number.");
-      } else {
-        studentData[input.toLowerCase()] = parsedGrade;
-      }
-    } else {
-      studentData[input.toLowerCase()] = inputValue;
-    }
   });
-  const classValue = getElementValueById(
-    `${isEditing ? "edit" : "add"}StudentClass`
+
+  const classValue = getInputElementValue("Class", isEditing);
+  isValid = validateAndUpdateDataField(
+    "Class",
+    classValue,
+    studentData,
+    isValid
   );
-  if (classValue.trim() === "") {
-    isValid = false;
-    displayErrorMessage("Please select a class.");
-  }
 
   if (!isValid) {
     displayErrorMessage(
@@ -103,50 +173,9 @@ function updateStudentData(isEditing) {
 
   if (isEditing) {
     const studentId = parseInt(getElementValueById("editStudentId"), 10);
-    const existingStudent = getStudentById(studentId);
-
-    if (!existingStudent) {
-      displayErrorMessage("Student not found");
-      return;
-    }
-
-    Object.assign(existingStudent, studentData);
-
-    existingStudent.subjects.forEach((subject, index) => {
-      const gradeInputValue = getElementValueById(`editSubject${index}`);
-      subject.grade = parseGradeInput(gradeInputValue);
-    });
+    updateStudent(isEditing, studentId, studentData);
   } else {
-    const subjects = [];
-    const subjectCount = 3;
-
-    for (let i = 0; i < subjectCount; i++) {
-      const subjectNameElement = document.getElementById(`nameSubject${i}`);
-
-      if (!subjectNameElement) {
-        displayErrorMessage(`Subject name element not found for index ${i}`);
-        continue;
-      }
-
-      const subjectName = subjectNameElement.innerText;
-      const gradeInputValue = getElementValueById(`addSubject${i}`);
-      const parsedGrade = parseGradeInput(gradeInputValue);
-
-      if (subjectName && parsedGrade !== undefined) {
-        subjects.push({ name: subjectName, grade: parsedGrade });
-      } else {
-        subjects.push({ name: subjectName, grade: 0 });
-      }
-    }
-
-    const newStudent = {
-      id: studentsData.length + 1,
-      ...studentData,
-      subjects,
-    };
-    studentsData.push(newStudent);
-    displaySuccessMessage("New student added successfully!");
-    console.log("New student added:", newStudent);
+    addNewStudent(studentData);
   }
 
   renderStudents();
@@ -157,13 +186,6 @@ function displayErrorMessage(message) {
   const errorMessageElement = document.getElementById("errorMessage");
   errorMessageElement.textContent = message;
   errorMessageElement.classList.add("text-danger");
-}
-
-function displaySuccessMessage(message) {
-  const errorMessageElement = document.getElementById("errorMessage");
-  errorMessageElement.textContent = message;
-  errorMessageElement.classList.remove("error");
-  errorMessageElement.classList.add("success");
 }
 
 function handleSaveButtonClick() {

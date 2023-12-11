@@ -27,6 +27,13 @@ function calculateAverageGrade(subjects) {
       (sum, subject) => sum + subject.grade,
       0
     );
-    return (totalGrades / subjects.length).toFixed(2);
+
+    const averageGrade = totalGrades / subjects.length;
+
+    if (averageGrade === 0) {
+      return "Grades not assigned yet";
+    }
+
+    return averageGrade.toFixed(2);
   }
 }
