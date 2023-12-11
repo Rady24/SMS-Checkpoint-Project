@@ -8,6 +8,7 @@ export default function studentsPageTemplate() {
 
   return `
     <div class="container-md" id="studentsContainer">
+    <h1 class="text-center m-4">Students</h1> 
       <div class="row" id="studentCardsContainer">${studentCards}</div>
       <button class="btn btn-primary mt-3" id="addStudent">Add</button>
     </div>

@@ -1,6 +1,7 @@
 import mainTemplate from "./main.template.js";
 import content from "../content/content.component.js";
 import studentsComponent from "../content/students/students.component.js";
+import classesComponent from "../content/classes/classes.component.js";
 
 function init() {
   const mainContainer = document.querySelector(".root");
@@ -24,6 +25,7 @@ function addEventListener() {
         break;
       case "classes":
         content.classesPage();
+        classesComponent.addEventListenerClasses();
         break;
       case "teachers":
         content.teachersPage();

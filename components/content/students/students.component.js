@@ -1,21 +1,7 @@
 import studentsData from "../../../data/studentsData.js";
 import studentModalComponent from "./student-modal/student-modal.component.js";
-
-function handleDeleteButtonClick(studentId) {
-  const indexToDelete = studentsData.findIndex(
-    (student) => student.id === parseInt(studentId, 10)
-  );
-
-  if (indexToDelete !== -1) {
-    studentsData.splice(indexToDelete, 1);
-    studentModalComponent.renderStudents();
-  }
-}
-
-function handleEditButtonClick(studentId) {
-  studentModalComponent.openStudentModal(studentId);
-  studentModalComponent.renderStudents();
-}
+import controller from "../../../utils/controller.js";
+import studentCardTemplate from "./student-card/student-card.template.js";
 
 function addEventListenerStudents() {
   const studentsContainer = document.getElementById("studentsContainer");
@@ -26,14 +12,20 @@ function addEventListenerStudents() {
       switch (targetButton.id) {
         case "deleteStudent":
           const studentIdToDelete = targetButton.dataset.studentId;
-          handleDeleteButtonClick(studentIdToDelete);
+          controller.handleDeleteButtonClick(studentIdToDelete, studentsData);
+          controller.render(
+            "studentCardsContainer",
+            studentsData,
+            studentCardTemplate
+          );
+
           break;
         case "editStudent":
           const studentIdToEdit = targetButton.dataset.studentId;
-          handleEditButtonClick(studentIdToEdit);
+          studentModalComponent.openStudentModal(studentIdToEdit);
           break;
         case "addStudent":
-          handleEditButtonClick();
+          studentModalComponent.openStudentModal();
           break;
         default:
           break;

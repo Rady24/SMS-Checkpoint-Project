@@ -141,7 +141,9 @@ export default function studentModalTemplate(student) {
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" id="${
               isEditing ? "saveEdit" : "saveAdd"
-            }Button">${isEditing ? "Save changes" : "Add Student"}</button>
+            }ButtonStudent">${
+    isEditing ? "Save changes" : "Add Student"
+  }</button>
           </div>
         </div>
       </div>
