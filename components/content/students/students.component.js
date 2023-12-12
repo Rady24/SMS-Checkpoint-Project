@@ -1,7 +1,14 @@
-import studentsData from "../../../data/studentsData.js";
+import hardcodedStudentsData from "../../../data/studentsData.js";
 import studentModalComponent from "./student-modal/student-modal.component.js";
 import controller from "../../../utils/controller.js";
 import studentCardTemplate from "./student-card/student-card.template.js";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+} from "../../../utils/storage.js";
+
+let studentsData =
+  loadFromLocalStorage("studentsData") || hardcodedStudentsData;
 
 function addEventListenerStudents() {
   const studentsContainer = document.getElementById("studentsContainer");
@@ -18,14 +25,15 @@ function addEventListenerStudents() {
             studentsData,
             studentCardTemplate
           );
+          saveToLocalStorage("studentsData", studentsData);
 
           break;
         case "editStudent":
           const studentIdToEdit = targetButton.dataset.studentId;
-          studentModalComponent.openStudentModal(studentIdToEdit);
+          studentModalComponent.openStudentModal(studentIdToEdit, studentsData);
           break;
         case "addStudent":
-          studentModalComponent.openStudentModal();
+          studentModalComponent.openStudentModal(undefined, studentsData);
           break;
         default:
           break;

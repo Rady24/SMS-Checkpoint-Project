@@ -1,5 +1,5 @@
 import studentModalTemplate from "./student-modal.template.js";
-import studentsData from "../../../../data/studentsData.js";
+import hardcodedStudentsData from "../../../../data/studentsData.js";
 import studentCardTemplate from "../student-card/student-card.template.js";
 import controller from "../../../../utils/controller.js";
 import {
@@ -8,14 +8,16 @@ import {
   hideModal,
 } from "../../../../utils/ui.js";
 import { isValidGrade, isValidName } from "../../../../utils/validation.js";
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+} from "../../../../utils/storage.js";
 
 let currentStudentId = null;
+let studentsData =
+  loadFromLocalStorage("studentsData") || hardcodedStudentsData;
 
-// function getStudentById(studentId) {
-//   return studentsData.find((student) => student.id === studentId);
-// }
-
-function openStudentModal(studentId) {
+function openStudentModal(studentId, studentsData) {
   const modalId = "studentModal";
   const existingModal = document.getElementById(modalId);
 
@@ -47,7 +49,7 @@ function parseGradeInput(inputValue) {
   }
 }
 
-function updateStudentData(isEditing) {
+function updateStudentData(isEditing, studentsData) {
   const inputs = ["Name", "Class", "Description"];
   const errorMessageElement = document.getElementById("errorMessage");
   errorMessageElement.textContent = "";
@@ -138,17 +140,20 @@ function updateStudentData(isEditing) {
       subjects,
     };
     studentsData.push(newStudent);
+    saveToLocalStorage("studentsData", studentsData);
   }
 
   controller.render("studentCardsContainer", studentsData, studentCardTemplate);
   hideModal("studentModal");
 }
 
-function handleSaveButtonClick() {
+function handleSaveButtonClick(studentsData) {
   if (currentStudentId) {
-    updateStudentData(true);
+    updateStudentData(true, studentsData);
+    saveToLocalStorage("studentsData", studentsData);
   } else {
-    updateStudentData(false);
+    updateStudentData(false, studentsData);
+    saveToLocalStorage("studentsData", studentsData);
   }
 }
 
@@ -160,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
       targetId === "saveEditButtonStudent" ||
       targetId === "saveAddButtonStudent"
     ) {
-      handleSaveButtonClick();
+      handleSaveButtonClick(studentsData);
     }
   });
 });

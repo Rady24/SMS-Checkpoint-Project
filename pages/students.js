@@ -1,7 +1,10 @@
 import studentCardComponent from "../components/content/students/student-card/student-card.component.js";
-import studentsData from "../data/studentsData.js";
+import hardcodedStudentsData from "../data/studentsData.js";
+import { loadFromLocalStorage } from "../utils/storage.js";
 
 export default function studentsPageTemplate() {
+  let studentsData =
+    loadFromLocalStorage("studentsData") || hardcodedStudentsData;
   const studentCards = studentsData
     .map((student) => studentCardComponent(student))
     .join("");

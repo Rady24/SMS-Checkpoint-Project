@@ -2,6 +2,7 @@ import mainTemplate from "./main.template.js";
 import content from "../content/content.component.js";
 import studentsComponent from "../content/students/students.component.js";
 import classesComponent from "../content/classes/classes.component.js";
+import teachersComponent from "../content/teachers/teachers.component.js";
 
 function init() {
   const mainContainer = document.querySelector(".root");
@@ -29,6 +30,7 @@ function addEventListener() {
         break;
       case "teachers":
         content.teachersPage();
+        teachersComponent.addEventListenerTeachers();
         break;
       case "students":
         content.studentsPage();

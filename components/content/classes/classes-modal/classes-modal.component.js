@@ -1,4 +1,4 @@
-import classesData from "../../../../data/classesData.js";
+import hardcodedClassesData from "../../../../data/classesData.js";
 import controller from "../../../../utils/controller.js";
 import classesCardTemplate from "../classes-card/classes-card.template.js";
 import classModalTemplate from "./classes-modal.template.js";
@@ -8,10 +8,15 @@ import {
   showModal,
   hideModal,
 } from "../../../../utils/ui.js";
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+} from "../../../../utils/storage.js";
 
 let currentClassId = null;
+let classesData = loadFromLocalStorage("classesData") || hardcodedClassesData;
 
-function updateClassData(isEditing) {
+function updateClassData(isEditing, classesData) {
   const inputs = ["className", "teacherName", "description"];
   const errorMessageElement = document.getElementById("errorMessage");
   errorMessageElement.textContent = "";
@@ -45,17 +50,20 @@ function updateClassData(isEditing) {
       ...classData,
     };
     classesData.push(newClass);
+    saveToLocalStorage("classesData", classesData);
   }
 
   controller.render("classCardsContainer", classesData, classesCardTemplate);
   hideModal("classModal");
 }
 
-function handleSaveButtonClick() {
+function handleSaveButtonClick(classesData) {
   if (currentClassId) {
-    updateClassData(true);
+    updateClassData(true, classesData);
+    saveToLocalStorage("classesData", classesData);
   } else {
-    updateClassData(false);
+    updateClassData(false, classesData);
+    saveToLocalStorage("classesData", classesData);
   }
 }
 
@@ -67,12 +75,12 @@ document.addEventListener("DOMContentLoaded", function () {
       targetId === "saveEditButtonClass" ||
       targetId === "saveAddButtonClass"
     ) {
-      handleSaveButtonClick();
+      handleSaveButtonClick(classesData, classesData);
     }
   });
 });
 
-function openClassModal(classId) {
+function openClassModal(classId, classesData) {
   const modalId = "classModal";
   const existingModal = document.getElementById(modalId);
 

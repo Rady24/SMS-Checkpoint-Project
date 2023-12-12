@@ -1,7 +1,9 @@
 import classesCardTemplate from "../components/content/classes/classes-card/classes-card.template.js";
-import classesData from "../data/classesData.js";
+import hardcodedClassesData from "../data/classesData.js";
+import { loadFromLocalStorage } from "../utils/storage.js";
 
 export default function template() {
+  let classesData = loadFromLocalStorage("classesData") || hardcodedClassesData;
   const classCards = classesData
     .map((classData) => classesCardTemplate(classData))
     .join("");

@@ -1,10 +1,27 @@
 import cardTemplate from "./home-card.template.js";
 import students from "../../../data/studentsData.js";
+import classes from "../../../data/classesData.js";
+import teachers from "../../../data/teachersData.js";
+import { loadFromLocalStorage } from "../../../utils/storage.js";
 
 export default function cardComponent() {
-  const classesCard = cardTemplate("Classes", "Classes", 10, "bi-book");
+  let teachersData = loadFromLocalStorage("teachersData") || teachers;
 
-  const studentsQuantity = students.length;
+  let classesData = loadFromLocalStorage("classesData") || classes;
+
+  let studentsData = loadFromLocalStorage("studentsData") || students;
+
+  const classesQuantity = classesData.length;
+  const studentsQuantity = studentsData.length;
+  const teachersQuantity = teachersData.length;
+
+  const classesCard = cardTemplate(
+    "Classes",
+    "Classes",
+    classesQuantity,
+    "bi-book"
+  );
+
   const studentsCard = cardTemplate(
     "Students",
     "Students",
@@ -14,7 +31,7 @@ export default function cardComponent() {
   const teachersCard = cardTemplate(
     "Teachers",
     "Teachers",
-    5,
+    teachersQuantity,
     "bi-person-check"
   );
 
